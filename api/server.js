@@ -1,13 +1,25 @@
-import express from 'express';
-import cors from 'cors';
-import "dotenv/config";
+import express, {json} from "express";
+import { gerarResposta } from "./openai.js";
 
-const api_key = process.env.OPENAI_API_KEY;
-const server = express();
-server.use(cors());
-server.use(express.json());
+const app = express();
+const port = 3000;
 
-const PORT = 3000;
-server.listen(PORT, ()=>{
-    console.log("server running on port"+PORT)
+app.use(express.json());
+
+app.post("/api/teste", async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        const resposta = await gerarResposta(prompt);
+        res.status(200).json({
+            recebido: prompt,
+            resposta
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "Erro interno."});
+    }
+});
+
+app.listen(port, () => {
+    console.log(`server running on ${port}`)
 });
