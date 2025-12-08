@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dietai</title>
+</head>
+<body>
+    <label for="prompt">Digite os alimentos consumidos hoje:</label><br/>
+    <textarea id="prompt" rows="5" cols="40" placeholder="Ex: 3 ovos, 1 prato de cuscuz, 200g de frango... (quanto mais detalhes melhor.)"></textarea>
+    <br>
+    <button id="send">Calculate</button>
+    <h2>Result:</h2>
+    <pre id="result"></pre>
+
+    <script>
+        const button = document.getElementById("send");
+        const prompt_input = document.getElementById("prompt");
+        const result = document.getElementById("result");
+
+        button.addEventListener("click", async () => {
+            const user_prompt = prompt_input.value.trim();
+
+            if (!user_prompt) {
+                result.textContent = "Type something before calculating.";
+                return;
+            }
+
+            result.textContent = "Calculating...";
+
+            try {
+                const response = await fetch("http://localhost:3000/api/dietai", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ user_prompt })
+                });
+
+                if (!response.ok) {
+                    result.textContent = "API Error: " + response.status;
+                    return;
+                }
+
+                const data = await response.json();
+                result.textContent = data.answer;
+            } catch (err) {
+                console.error(err);
+                result.textContent = "ERROR connecting to the server: " + err;
+            }
+        });
+    </script>
+</body>
+</html>
