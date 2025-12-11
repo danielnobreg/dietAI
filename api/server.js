@@ -1,8 +1,7 @@
 import express from "express";
-import { generateAnswer } from "./openai.js";
 import path from "path";
+import { generateAnswer } from "./openai.js";
 import { fileURLToPath } from "url";
-
 
 const app = express();
 const port = 3000;
