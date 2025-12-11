@@ -1,12 +1,27 @@
 import { loadHistory, addToHistory, clearHistory } from './storage.js';
 
-const button = document.getElementById("send");
+const button_clear = document.getElementById("clear");
+const button_send = document.getElementById("send");
 const prompt_input = document.getElementById("prompt");
 const result = document.getElementById("result");
 
 renderHistory();
 
-button.addEventListener("click", async () => {
+button_clear.addEventListener("click", async() => {
+    const history = loadHistory();
+
+    if (!history.length === 0) return;
+
+    try {
+        clearHistory();
+        renderHistory();
+    } catch (err) {
+        console.error("Error during history clear."+err);
+    }
+
+});
+
+button_send.addEventListener("click", async () => {
     const user_prompt = prompt_input.value.trim();
 
     if (!user_prompt) {
@@ -14,8 +29,8 @@ button.addEventListener("click", async () => {
         return;
     }
 
-    button.disabled = true;
-    button.textContent = "Calculating...";
+    button_send.disabled = true;
+    button_send.textContent = "Calculating...";
     result.textContent = "Processing...";
 
     try {
@@ -40,8 +55,8 @@ button.addEventListener("click", async () => {
         console.error(err);
         result.textContent = "Error in the conection: " + err.message;
     } finally {
-        button.disabled = false;
-        button.textContent = "Calculate";
+        button_send.disabled = false;
+        button_send.textContent = "Calculate";
     }
 });
 
@@ -52,15 +67,16 @@ function renderHistory() {
     if (!historyDiv) return;
     
     if (history.length === 0) {
-        historyDiv.innerHTML = '<p>Theres no consultation</p>';
+        historyDiv.innerHTML = '<p>Nothing to see here :(</p>';
         return;
     }
     
     historyDiv.innerHTML = history.map(item => `
         <div class="history-item">
             <div>${item.date}</div>
-            <div><strong>${item.prompt}</strong></div>
-            <div>${item.answer.substring(0, 100)}...</div>
+            <div><strong>${ item.prompt}</strong></div>
+            <div>${item.answer.substring(0, 100)}</div>
+            <div><br></div>
         </div>
     `).join('');
 }
